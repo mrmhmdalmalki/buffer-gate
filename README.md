@@ -25,4 +25,4 @@ If the input signal is weak, noisy, or unable to drive a load, the buffer provid
 ## How to make a buffer gate
 we will make this circuit as shown below:
 
-![Diagram](./images/circuit.png)
+<img src="/images/circuit.png" width="300">
