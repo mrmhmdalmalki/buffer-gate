@@ -13,14 +13,10 @@ It does not change the logic level, but it can **strengthen, isolate, and stabil
 ### Truth Table :
 
 | Input | Output |
-
 |-------|--------|
-
 | 0 | 0 |
-
 | 1 | 1 |
 
-  
 ## Why not just use a wire
 
 A wire simply passes the signal as it is, including any noise, voltage drop, or weakness in the signal. It does not improve or protect the signal in any way.
