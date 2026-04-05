@@ -1,4 +1,3 @@
-
 # This is a design of a Buffer gate
 
 ## What is a Buffer Gate
