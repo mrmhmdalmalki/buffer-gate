@@ -1,5 +1,5 @@
 
-# This is a design or a Buffer gate
+# This is a design of a Buffer gate
 
 ## What is a Buffer Gate
 
