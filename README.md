@@ -36,3 +36,7 @@ We will make this circuit as shown below:
 We will make this circuit as shown below:
 
 <img  src="/images/implementation.jpeg"  width="600">
+
+Try it out:
+
+<iframe src="https://withdiode.com/embed/e2e956d6-6120-47aa-b7ac-be8c53823dbb" style="width:100%; height:500px; border:1px solid rgba(0,0,0,0.1); border-radius: 0.5rem; overflow:hidden;" title="Buffer Gate" allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking" sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts" ></iframe>
