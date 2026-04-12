@@ -31,7 +31,7 @@ We will make this circuit as shown below:
 
 <img  src="/images/circuit.png"  width="600">
 
-## The implemntation on a bredboard
+## The implementation on a breadboard
 
 We will make this circuit as shown below:
 
