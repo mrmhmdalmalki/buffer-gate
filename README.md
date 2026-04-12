@@ -35,7 +35,7 @@ We will make this circuit as shown below:
 
 We will make this circuit as shown below:
 
-<img  src="/images/implementation.jpeg"  width="600">
+<img  src="/images/implementation.png"  width="600">
 
 Try it out:
 
