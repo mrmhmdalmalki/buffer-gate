@@ -1,0 +1,67 @@
+% ============================================================
+%  Buffer gate - transistor-level realization (buildable)
+%  Two common-emitter NPN NOT-gate stages in series:
+%        buffer = NOT + NOT
+%  Logic 0  ->  output tied to GROUND through a saturated NPN
+%  Logic 1  ->  output tied to +5 V through the pull-up resistor
+%
+%  Compile:  pdflatex circuit.tex
+% ============================================================
+\documentclass[border=12pt]{standalone}
+\usepackage{circuitikz}
+\usepackage{amsmath}
+\usetikzlibrary{decorations.pathreplacing}
+
+\begin{document}
+\begin{circuitikz}[american, line width=0.7pt, scale=1.0, transform shape]
+
+  % ---------- Supply rail (+5 V) ----------
+  \draw (-0.5,6) -- (13,6);
+  \node[anchor=south] at (6.25,6.05) {\textbf{$V_{CC} = +5\,\mathrm{V}$}};
+  \fill (1.5,6) circle (1.6pt);   % rail tap for R_C1
+  \fill (10,6) circle (1.6pt);    % rail tap for R_C2
+
+  % ====================== STAGE 1 (NOT) ======================
+  \node[npn] (q1) at (1.5,2.5) {};
+  \node[anchor=west] at ($(q1.E)+(0.45,0.15)$) {Q1};
+
+  % input + base resistor R_B1
+  \draw (-2.5,2.5) node[ocirc]{} node[left]{Input $A$}
+        to[R, l={$R_{B1}=10\,\mathrm{k}\Omega$}] (q1.B);
+
+  % emitter -> ground
+  \draw (q1.E) -- ++(0,-1.1) node[ground]{};
+
+  % collector pull-up R_C1 up to the rail
+  \draw (q1.C) to[R, l_={$R_{C1}=1\,\mathrm{k}\Omega$}] (1.5,6);
+
+  % intermediate node  (= NOT A)
+  \node[anchor=south west] at (1.7,3.55) {$\overline{A}$};
+
+  % ====================== STAGE 2 (NOT) ======================
+  \node[npn] (q2) at (10,2.5) {};
+  \node[anchor=west] at ($(q2.E)+(0.45,0.15)$) {Q2};
+
+  % inter-stage base resistor R_B2  (collector of Q1 -> base of Q2)
+  \draw (q1.C) -- ++(1.5,0) coordinate(m1);
+  \draw (m1) -- (m1|-q2.B) to[R, l={$R_{B2}=10\,\mathrm{k}\Omega$}] (q2.B);
+
+  % emitter -> ground
+  \draw (q2.E) -- ++(0,-1.1) node[ground]{};
+
+  % collector pull-up R_C2 up to the rail
+  \draw (q2.C) to[R, l_={$R_{C2}=1\,\mathrm{k}\Omega$}] (10,6);
+
+  % output taken at Q2 collector  (= NOT(NOT A) = A)
+  \draw (q2.C) -- ++(2.5,0) node[ocirc]{} node[right]{Output $Y=A$};
+
+  % ---------- stage brackets ----------
+  \draw[decorate, decoration={brace, amplitude=5pt}, line width=0.5pt]
+        (-2.6,-1.0) -- (3.4,-1.0)
+        node[midway, below=6pt]{\small NOT gate 1: $A \rightarrow \overline{A}$};
+  \draw[decorate, decoration={brace, amplitude=5pt}, line width=0.5pt]
+        (5.0,-1.0) -- (12.8,-1.0)
+        node[midway, below=6pt]{\small NOT gate 2: $\overline{A} \rightarrow A$};
+
+\end{circuitikz}
+\end{document}

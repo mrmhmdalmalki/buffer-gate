@@ -1,0 +1,25 @@
+% ============================================================
+%  Buffer gate - standard ANSI/IEEE distinctive-shape symbol
+%  A triangle pointing in the direction of signal flow.
+%  (Compare: a NOT gate is this same triangle PLUS a small
+%   bubble on the output.)
+%
+%  Compile:  pdflatex symbol.tex
+% ============================================================
+\documentclass[border=12pt]{standalone}
+\usepackage{circuitikz}
+
+\begin{document}
+\begin{circuitikz}[line width=0.8pt, scale=1.4, transform shape]
+
+  % standard buffer (non-inverting) gate symbol
+  \node[buffer port] (b) {};
+
+  % input
+  \draw (b.in) -- ++(-1,0) node[ocirc]{} node[left]{Input $A$};
+
+  % output
+  \draw (b.out) -- ++(1,0) node[ocirc]{} node[right]{Output $Y = A$};
+
+\end{circuitikz}
+\end{document}
