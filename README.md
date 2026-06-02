@@ -8,7 +8,7 @@ logic level, but it **cleans up and re-drives the signal** to full, solid voltag
 A triangle pointing in the direction of signal flow. (A NOT gate is this same triangle
 **plus a bubble** on the output.)
 
-<img src="images/symbol.png" width="380">
+<img src="images/symbol.png" width="460">
 
 ### Truth table
 
@@ -43,7 +43,7 @@ A buffer must restore full logic levels, so we chain **two NOT-gate stages**:
 Each stage is a **common-emitter NPN NOT gate**: emitter to ground, collector pulled up to
 `+5 V` through a resistor, output taken at the collector.
 
-<img src="images/circuit.png" width="760">
+<img src="images/circuit.png" width="900">
 
 **One stage:**
 - Input `1` → transistor ON → collector **pulled to ground** → stage output `0`.
@@ -64,11 +64,11 @@ So `Y = A`, with a clean `0 V` for `0` and a clean `+5 V` for `1`.
 
 Two stacked NOT stages. Identify each 2N3904's legs with the pinout (flat face toward you, legs pointing down, **E B C** from left to right), then wire it exactly like the pin-labeled schematic above.
 
-<img src="images/pinout.png" width="300">
+<img src="images/pinout.png" width="360">
 
 The wiring picture below is the same circuit drawn the way the parts physically sit on the board (each TO-92 package with its legs pointing down), so each leg maps straight to where its wire goes:
 
-<img src="images/wiring.png" width="640">
+<img src="images/wiring.png" width="900">
 
 Connect each 2N3904 as follows:
 

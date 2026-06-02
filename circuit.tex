@@ -19,8 +19,17 @@
   \node[red,font=\bfseries\footnotesize,anchor=north west] at ($(#1.E)+(0.05,-0.05)$){E};
 }
 
+% ground symbol (pic): same stroke as everything, just extra gap between bars
+\tikzset{gnd/.pic={
+  \draw
+    (0,0) -- (0,-0.18)
+    (-0.34,-0.18) -- (0.34,-0.18)
+    (-0.21,-0.37) -- (0.21,-0.37)
+    (-0.08,-0.56) -- (0.08,-0.56);
+}}
 \begin{document}
-\begin{circuitikz}[american, line width=0.7pt, scale=1.0, transform shape]
+\begin{circuitikz}[american, line width=0.8pt, scale=1.0, transform shape]
+  \ctikzset{tripoles/thickness=1, bipoles/thickness=1, logic ports/thickness=1}
 
   % ---------- Supply rail (+5 V) ----------
   \draw (-0.5,6) -- (13,6);
@@ -38,7 +47,7 @@
         to[R, l={$R_{B1}=10\,\mathrm{k}\Omega$}] (q1.B);
 
   % emitter -> ground
-  \draw (q1.E) -- ++(0,-1.1) node[ground]{};
+  \draw (q1.E) -- ++(0,-1.1) pic{gnd};
 
   % collector pull-up R_C1 up to the rail
   \draw (q1.C) to[R, l_={$R_{C1}=1\,\mathrm{k}\Omega$}] (1.5,6);
@@ -56,7 +65,7 @@
   \draw (m1) -- (m1|-q2.B) to[R, l={$R_{B2}=10\,\mathrm{k}\Omega$}] (q2.B);
 
   % emitter -> ground
-  \draw (q2.E) -- ++(0,-1.1) node[ground]{};
+  \draw (q2.E) -- ++(0,-1.1) pic{gnd};
 
   % collector pull-up R_C2 up to the rail
   \draw (q2.C) to[R, l_={$R_{C2}=1\,\mathrm{k}\Omega$}] (10,6);
@@ -65,10 +74,10 @@
   \draw (q2.C) -- ++(2.5,0) node[ocirc]{} node[right]{Output $Y=A$};
 
   % ---------- stage brackets ----------
-  \draw[decorate, decoration={brace, amplitude=5pt}, line width=0.5pt]
+  \draw[decorate, decoration={brace, amplitude=5pt}, line width=0.8pt]
         (-2.6,-1.0) -- (3.4,-1.0)
         node[midway, below=6pt]{\small NOT gate 1: $A \rightarrow \overline{A}$};
-  \draw[decorate, decoration={brace, amplitude=5pt}, line width=0.5pt]
+  \draw[decorate, decoration={brace, amplitude=5pt}, line width=0.8pt]
         (5.0,-1.0) -- (12.8,-1.0)
         node[midway, below=6pt]{\small NOT gate 2: $\overline{A} \rightarrow A$};
 
