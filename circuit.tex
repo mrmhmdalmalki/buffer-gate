@@ -12,6 +12,13 @@
 \usepackage{amsmath}
 \usetikzlibrary{decorations.pathreplacing}
 
+% red C/B/E pin labels on a transistor (matches the physical 2N3904 legs)
+\newcommand{\pinlabels}[1]{%
+  \node[red,font=\bfseries\footnotesize,anchor=south west] at ($(#1.C)+(0.02,0.05)$){C};
+  \node[red,font=\bfseries\footnotesize,anchor=south east] at ($(#1.B)+(-0.02,0.05)$){B};
+  \node[red,font=\bfseries\footnotesize,anchor=north west] at ($(#1.E)+(0.05,-0.05)$){E};
+}
+
 \begin{document}
 \begin{circuitikz}[american, line width=0.7pt, scale=1.0, transform shape]
 
@@ -24,6 +31,7 @@
   % ====================== STAGE 1 (NOT) ======================
   \node[npn] (q1) at (1.5,2.5) {};
   \node[anchor=west] at ($(q1.E)+(0.45,0.15)$) {Q1};
+  \pinlabels{q1}
 
   % input + base resistor R_B1
   \draw (-2.5,2.5) node[ocirc]{} node[left]{Input $A$}
@@ -36,11 +44,12 @@
   \draw (q1.C) to[R, l_={$R_{C1}=1\,\mathrm{k}\Omega$}] (1.5,6);
 
   % intermediate node  (= NOT A)
-  \node[anchor=south west] at (1.7,3.55) {$\overline{A}$};
+  \node[anchor=south] at (2.6,3.35) {$\overline{A}$};
 
   % ====================== STAGE 2 (NOT) ======================
   \node[npn] (q2) at (10,2.5) {};
   \node[anchor=west] at ($(q2.E)+(0.45,0.15)$) {Q2};
+  \pinlabels{q2}
 
   % inter-stage base resistor R_B2  (collector of Q1 -> base of Q2)
   \draw (q1.C) -- ++(1.5,0) coordinate(m1);
