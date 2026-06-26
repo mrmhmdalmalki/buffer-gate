@@ -1,12 +1,17 @@
 # Buffer Gate
 
-A buffer gate **outputs the same value as its input** (`Y = A`). It does not change the
-logic level, but it **cleans up and re-drives the signal** to full, solid voltage levels.
+A buffer gate **outputs the same value as its input** (`Y = A`). It does not change the logic
+level, but it **cleans up and re-drives the signal** to full, solid voltage levels.
+
+This buffer is built the simplest possible way — it is just **two NOT gates in a row**, so
+there is nothing new to build at the transistor level. Each NOT gate is the complementary
+`2N3904 + 2N3906` inverter board from the [`not`](https://github.com/mrmhmdalmalki/not-gate)
+folder; you build that board twice and wire them together.
 
 ### Symbol
 
-A triangle pointing in the direction of signal flow. (A NOT gate is this same triangle
-**plus a bubble** on the output.)
+A triangle pointing in the direction of signal flow. (A NOT gate is this same triangle **plus a
+bubble** on the output; a buffer is two NOT gates, so the two bubbles cancel.)
 
 <img src="images/symbol.png" width="460">
 
@@ -19,96 +24,57 @@ A triangle pointing in the direction of signal flow. (A NOT gate is this same tr
 
 ---
 
-## What `0` and `1` really mean
-
-`0` is **not** an empty wire. Both levels are real voltages the output is connected to:
-
-| Level | Connected to | Voltage |
-|:-----:|:-------------|:-------:|
-| `1` (HIGH) | the supply rail **Vcc** | `+5 V` |
-| `0` (LOW)  | **ground (GND)**          | `0 V`  |
-
-So `0` means the output is **actively pulled down to ground (0 V)** through a conducting
-transistor, not "no electricity." A wire connected to *nothing* is a third, undefined state
-called **floating**; it picks up noise and reads randomly, so we never leave a node floating.
-
----
-
 ## How it is built
 
-A buffer must restore full logic levels, so we chain **two NOT-gate stages**:
+> buffer = NOT( NOT(A) ) = A
 
-> buffer = NOT(NOT(A)) = A
+Two NOT gates in series. The first inverts `A` to `Ā`; the second inverts `Ā` back to `A`. Two
+inversions cancel, so the output equals the input — but now re-driven to a clean, strong
+`~4.8 V` for `1` and `~0.2 V` for `0`.
 
-Each stage is a **common-emitter NPN NOT gate**: emitter to ground, collector pulled up to
-`+5 V` through a resistor, output taken at the collector.
+<img src="images/circuit.png" width="760">
 
-<img src="images/circuit.png" width="900">
-
-**One stage:**
-- Input `1` → transistor ON → collector **pulled to ground** → stage output `0`.
-- Input `0` → transistor OFF → collector **pulled to +5 V** → stage output `1`.
-
-**Both stages together:**
-
-| `A` | `Ā` (middle) | `Y` (output) |
-|:---:|:-----------:|:------------:|
-| `0` | `1` | `0` → tied to **GND** through Q2 |
-| `1` | `0` | `1` → tied to **+5 V** through `R_C2` |
-
-So `Y = A`, with a clean `0 V` for `0` and a clean `+5 V` for `1`.
+Because each NOT stage is the complementary push-pull inverter, the output is **actively
+driven** and can comfortably feed the next gate. That is the whole point of a buffer: restore a
+tired or marginal signal back to a full, strong logic level.
 
 ---
 
 ## Building it on a breadboard
 
-Two stacked NOT stages. Identify each 2N3904's legs with the pinout (flat face toward you, legs pointing down, **E B C** from left to right), then wire it exactly like the pin-labeled schematic above.
+This gate has **no transistors of its own**; it is **two finished NOT-gate boards** wired in
+series. Build the NOT gate twice, then connect them as shown:
 
-<img src="images/pinout.png" width="360">
+<img src="images/wiring.png" width="820">
 
-The wiring picture below is the same circuit drawn the way the parts physically sit on the board (each TO-92 package with its legs pointing down), so each leg maps straight to where its wire goes:
+| Block | Build guide | Input | Its output goes to |
+|:------|:------------|:------|:-------------------|
+| **NOT board 1** | [not-gate](https://github.com/mrmhmdalmalki/not-gate) | Input `A` | the input of NOT board 2 (this node is `Ā`) |
+| **NOT board 2** | [not-gate](https://github.com/mrmhmdalmalki/not-gate) | `Ā` (output of board 1) | Output `Y = A` |
 
-<img src="images/wiring.png" width="900">
+Both boards share the **same +5 V rail and the same GND**. `+5 V` and `GND` are **nodes**, not
+physical positions, so either rail of your breadboard can be the +5 V rail.
 
-Connect each 2N3904 as follows:
-
-| Transistor | E (emitter) | B (base) | C (collector) |
-|:-----------|:------------|:---------|:--------------|
-| **Q1** | GND | through R_B1 (10 kΩ) to Input A | through R_C1 (1 kΩ) to +5 V; this node (Ā) also drives Q2 through R_B2 |
-| **Q2** | GND | through R_B2 (10 kΩ) to Q1's collector (the Ā node) | through R_C2 (1 kΩ) to +5 V; this node is Output Y |
-
-Reminder: `+5 V` and `GND` are **nodes** (named connections), not physical positions, so the +5 V rail can be the top or the bottom rail of your board. If a result is wrong, the usual cause is a transistor's legs in the wrong holes, so re-check **E B C** against the pinout.
-
-Quick test: Input A = +5 V gives Output ≈ +5 V; Input A = GND gives Output ≈ GND (a buffer copies the input).
+Quick test: Input `A` = +5 V gives Output ≈ +5 V; Input `A` = GND gives Output ≈ GND (a buffer
+copies the input). The middle node `Ā` is always the opposite of both.
 
 ---
 
 ## Components
 
-### Transistors: 2N3904  (×2: Q1, Q2)
+A buffer is two NOT gates, each already documented (and built from transistors) in this project:
 
-- **Type:** **NPN** *bipolar junction transistor* (BJT), a current-controlled switch: a
-  small current into the **base** lets a much larger current flow from **collector** to
-  **emitter**. Here each transistor is used fully on/off, as a switch.
-- **Package:** TO-92 (small black half-cylinder of plastic with 3 legs).
-- **Pinout:** hold it with the **flat face toward you and the legs pointing down**, and the pins
-  are **E, B, C** (Emitter, Base, Collector) from left to right.
-- **Key ratings:** V_CE ≈ **40 V** max, I_C ≈ **200 mA** max, current gain *hFE* ≈ **100–300**.
-- **Why NPN (not PNP)?** The emitter sits at **ground**, so a HIGH (+5 V) on the base turns
-  the transistor ON and drags its collector **down to ground**. A PNP works upside-down
-  (emitter at +5 V, on when the base is LOW) and would need the circuit re-wired.
-- **Substitutes:** 2N2222, PN2222, BC547, or any general-purpose NPN. **Re-check the pinout.**
+| Block | Folder | Transistors |
+|:------|:-------|:-----------:|
+| NOT | [`not-gate`](https://github.com/mrmhmdalmalki/not-gate) | 1 × 2N3904 (NPN) + 1 × 2N3906 (PNP) |
+| NOT | [`not-gate`](https://github.com/mrmhmdalmalki/not-gate) | 1 × 2N3904 (NPN) + 1 × 2N3906 (PNP) |
 
-### Resistors
-
-| Ref | Value | Job |
-|:---:|:-----:|:----|
-| R_B1, R_B2 | **10 kΩ** | **Base resistors**, limit base current to a safe level while still switching the transistor fully on. |
-| R_C1, R_C2 | **1 kΩ**  | **Collector pull-ups**, provide the HIGH (+5 V) level and limit current when the transistor pulls its output low. |
+**Total: 2 × 2N3904 + 2 × 2N3906**, plus each board's base resistors (10 kΩ) and LED resistors
+(220 Ω) and indicator LEDs. See the `not` folder for the exact per-board wiring.
 
 ### Power
 
-- A **+5 V** supply rail and a common **GND** (0 V) reference.
+- One shared **+5 V** rail and a common **GND** for both boards.
 
 ---
 
@@ -120,30 +86,27 @@ Quick test: Input A = +5 V gives Output ≈ +5 V; Input A = GND gives Output ≈
 - Free explainer: Texas Instruments, *Overview of IEEE Standard 91-1984* (PDF) ([ti.com](https://www.ti.com/lit/ml/sdyz001a/sdyz001a.pdf)).
 - Symbols and truth tables overview: *Logic gate*, Wikipedia ([wikipedia.org](https://en.wikipedia.org/wiki/Logic_gate)).
 
-**Transistor circuit.** This buffer is two cascaded NOT stages (common-emitter RTL NOT stages), so that NOT(NOT A) = A. It follows standard transistor switch logic with the common-emitter RTL stage as the building block:
+**Transistor circuit.** Each NOT stage is a complementary (CMOS-style) push-pull inverter — a matched NPN/PNP pair sharing one output:
 
-- *Resistor-Transistor Logic (RTL)*, Wikipedia ([wikipedia.org](https://en.wikipedia.org/wiki/Resistor%E2%80%93transistor_logic)).
-- *NOR and NAND gates using transistor*, TheoryCircuit ([theorycircuit.com](https://theorycircuit.com/digital-electronics/nor-and-nand-gates-using-transistor/)).
-- *Logic Gates using Transistors*, Electronics Tutorials ([electronics-tutorials.ws](https://www.electronics-tutorials.ws/logic/logic-gates-using-transistors.html)).
-- P. Horowitz and W. Hill, *The Art of Electronics*, 3rd ed., Cambridge University Press, 2015 (the BJT used as a switch).
-- A. S. Sedra and K. C. Smith, *Microelectronic Circuits*, Oxford University Press (BJT switch and the logic NOT gate).
+- *Push–pull / complementary output*, Wikipedia ([wikipedia.org](https://en.wikipedia.org/wiki/Push%E2%80%93pull_output)).
+- *CMOS inverter*, Wikipedia ([wikipedia.org](https://en.wikipedia.org/wiki/CMOS#Inversion)).
+- P. Horowitz and W. Hill, *The Art of Electronics*, 3rd ed., Cambridge University Press, 2015.
+- A. S. Sedra and K. C. Smith, *Microelectronic Circuits*, Oxford University Press.
 - T. L. Floyd, *Digital Fundamentals*, Pearson (logic-gate symbols and truth tables).
 
-**Transistor part.** 2N3904 NPN, onsemi datasheet ([PDF](https://www.onsemi.com/pdf/datasheet/2n3904-d.pdf)), product page ([onsemi.com](https://www.onsemi.com/products/discrete-power-modules/general-purpose-and-low-vcesat-transistors/2n3904)).
-
-**Highlighted source (additional).** The exact building block this design uses, scroll-to-text highlighted on the Wikipedia RTL page: [“a common-emitter stage with a base resistor”](https://en.wikipedia.org/wiki/Resistor%E2%80%93transistor_logic#:~:text=common-emitter%20stage%20with%20a%20base%20resistor).
+**Transistor parts.** 2N3904 NPN, onsemi datasheet ([PDF](https://www.onsemi.com/pdf/datasheet/2n3904-d.pdf)). 2N3906 PNP, onsemi datasheet ([PDF](https://www.onsemi.com/pdf/datasheet/2n3906-d.pdf)).
 
 ---
 
 ## Regenerating the diagrams
 
-The schematics are drawn in LaTeX with `circuitikz`:
-
 ```bash
 pdflatex circuit.tex
 pdflatex symbol.tex
-pdftoppm -png -r 600 circuit.pdf images/circuit   # -> images/circuit-1.png
-pdftoppm -png -r 600 symbol.pdf  images/symbol     # -> images/symbol-1.png
+pdflatex wiring.tex
+pdftoppm -png -r 400 circuit.pdf images/circuit   # -> images/circuit-1.png
+pdftoppm -png -r 400 symbol.pdf  images/symbol     # -> images/symbol-1.png
+pdftoppm -png -r 400 wiring.pdf  images/wiring     # -> images/wiring-1.png
 ```
 
 > Use `pdftoppm`, not `pdftocairo`, at high DPI the Cairo backend can garble the fonts.

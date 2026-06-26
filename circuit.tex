@@ -1,85 +1,36 @@
 % ============================================================
-%  Buffer gate - transistor-level realization (buildable)
-%  Two common-emitter NPN NOT-gate stages in series:
-%        buffer = NOT + NOT
-%  Logic 0  ->  output tied to GROUND through a saturated NPN
-%  Logic 1  ->  output tied to +5 V through the pull-up resistor
-%
+%  BUFFER gate - logic diagram.
+%  A buffer is simply TWO NOT gates in series:
+%        buffer = NOT(NOT(A)) = A
+%  Each NOT gate is the complementary (2N3904 + 2N3906) inverter
+%  board from the `not` folder - nothing new to build at the
+%  transistor level, just wire two of them together.
 %  Compile:  pdflatex circuit.tex
 % ============================================================
-\documentclass[border=12pt]{standalone}
+\documentclass[border=16pt]{standalone}
 \usepackage{circuitikz}
 \usepackage{amsmath}
-\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{calc}
 
-% red C/B/E pin labels on a transistor (matches the physical 2N3904 legs)
-\newcommand{\pinlabels}[1]{%
-  \node[red,font=\bfseries\footnotesize,anchor=south west] at ($(#1.C)+(0.02,0.05)$){C};
-  \node[red,font=\bfseries\footnotesize,anchor=south east] at ($(#1.B)+(-0.02,0.05)$){B};
-  \node[red,font=\bfseries\footnotesize,anchor=north west] at ($(#1.E)+(0.05,-0.05)$){E};
-}
-
-% ground symbol (pic): same stroke as everything, just extra gap between bars
-\tikzset{gnd/.pic={
-  \draw
-    (0,0) -- (0,-0.18)
-    (-0.34,-0.18) -- (0.34,-0.18)
-    (-0.21,-0.37) -- (0.21,-0.37)
-    (-0.08,-0.56) -- (0.08,-0.56);
-}}
 \begin{document}
-\begin{circuitikz}[american, line width=0.8pt, scale=1.0, transform shape]
-  \ctikzset{tripoles/thickness=1, bipoles/thickness=1, logic ports/thickness=1}
+\begin{circuitikz}[line width=1.0pt, scale=1.6, transform shape]
+  \ctikzset{logic ports=american, logic ports/thickness=1.1}
 
-  % ---------- Supply rail (+5 V) ----------
-  \draw (-0.5,6) -- (13,6);
-  \node[anchor=south] at (6.25,6.05) {\textbf{$V_{CC} = +5\,\mathrm{V}$}};
-  \fill (1.5,6) circle (1.6pt);   % rail tap for R_C1
-  \fill (10,6) circle (1.6pt);    % rail tap for R_C2
+  % the two NOT gates
+  \node[not port] (g1) at (0,0)   {};
+  \node[not port] (g2) at (3.6,0) {};
+  \node[below=3pt,font=\footnotesize] at (g1.south) {NOT};
+  \node[below=3pt,font=\footnotesize] at (g2.south) {NOT};
 
-  % ====================== STAGE 1 (NOT) ======================
-  \node[npn] (q1) at (1.5,2.5) {};
-  \node[anchor=west] at ($(q1.E)+(0.45,0.15)$) {Q1};
-  \pinlabels{q1}
+  % input A
+  \draw (g1.in) -- ++(-1.6,0) node[ocirc]{} node[left]{Input $A$};
 
-  % input + base resistor R_B1
-  \draw (-2.5,2.5) node[ocirc]{} node[left]{Input $A$}
-        to[R, l={$R_{B1}=10\,\mathrm{k}\Omega$}] (q1.B);
+  % middle node  A-bar
+  \draw (g1.out) -- (g2.in);
+  \node[above=1pt,font=\footnotesize] at ($(g1.out)!0.5!(g2.in)$) {$\overline{A}$};
 
-  % emitter -> ground
-  \draw (q1.E) -- ++(0,-1.1) pic{gnd};
-
-  % collector pull-up R_C1 up to the rail
-  \draw (q1.C) to[R, l_={$R_{C1}=1\,\mathrm{k}\Omega$}] (1.5,6);
-
-  % intermediate node  (= NOT A)
-  \node[anchor=south] at (2.6,3.35) {$\overline{A}$};
-
-  % ====================== STAGE 2 (NOT) ======================
-  \node[npn] (q2) at (10,2.5) {};
-  \node[anchor=west] at ($(q2.E)+(0.45,0.15)$) {Q2};
-  \pinlabels{q2}
-
-  % inter-stage base resistor R_B2  (collector of Q1 -> base of Q2)
-  \draw (q1.C) -- ++(1.5,0) coordinate(m1);
-  \draw (m1) -- (m1|-q2.B) to[R, l={$R_{B2}=10\,\mathrm{k}\Omega$}] (q2.B);
-
-  % emitter -> ground
-  \draw (q2.E) -- ++(0,-1.1) pic{gnd};
-
-  % collector pull-up R_C2 up to the rail
-  \draw (q2.C) to[R, l_={$R_{C2}=1\,\mathrm{k}\Omega$}] (10,6);
-
-  % output taken at Q2 collector  (= NOT(NOT A) = A)
-  \draw (q2.C) -- ++(2.5,0) node[ocirc]{} node[right]{Output $Y=A$};
-
-  % ---------- stage brackets ----------
-  \draw[decorate, decoration={brace, amplitude=5pt}, line width=0.8pt]
-        (-2.6,-1.0) -- (3.4,-1.0)
-        node[midway, below=6pt]{\small NOT gate 1: $A \rightarrow \overline{A}$};
-  \draw[decorate, decoration={brace, amplitude=5pt}, line width=0.8pt]
-        (5.0,-1.0) -- (12.8,-1.0)
-        node[midway, below=6pt]{\small NOT gate 2: $\overline{A} \rightarrow A$};
+  % output Y = A
+  \draw (g2.out) -- ++(1.6,0) node[ocirc]{} node[right]{Output $Y=A$};
 
 \end{circuitikz}
 \end{document}
